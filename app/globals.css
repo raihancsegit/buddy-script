@@ -1,0 +1,44 @@
+/* Fix main layout scroll - the original CSS uses JS-based scroll,
+   but we need native browser scroll for our Next.js app */
+
+body {
+    overflow-x: hidden;
+}
+
+/* Override: allow full page scroll instead of overflow:hidden */
+._main_layout {
+    height: auto !important;
+    overflow: visible !important;
+    min-height: 100vh;
+}
+
+._layout_inner_wrap {
+    overflow: visible !important;
+    padding-top: 80px !important;
+}
+
+/* Sidebars: remove fixed height so they expand with content */
+._layout_left_sidebar_wrap,
+._layout_right_sidebar_wrap {
+    height: auto !important;
+    overflow: visible !important;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto !important;
+}
+
+/* Middle feed: full natural height, no clip */
+._layout_middle_wrap {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+._layout_middle_content_wrap {
+    padding-bottom: 40px;
+}
+
+._layout_main_wrapper {
+    min-height: 100vh;
+    background: var(--bcolor1);
+}
