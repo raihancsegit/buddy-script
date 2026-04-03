@@ -1,9 +1,22 @@
-import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// Lazy import to avoid issues with Prisma 7 adapter types
+let _prisma: any;
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient();
+function getPrisma() {
+  if (_prisma) return _prisma;
+  // Dynamically require to work around Prisma 7 type issues
+  const { PrismaClient } = require('@prisma/client');
+  try {
+    const { PrismaPg } = require('@prisma/adapter-pg');
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg(pool);
+    _prisma = new PrismaClient({ adapter });
+  } catch {
+    // Fallback if adapter not available
+    _prisma = new PrismaClient();
+  }
+  return _prisma;
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export const prisma = getPrisma();
