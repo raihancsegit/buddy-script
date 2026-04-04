@@ -1,22 +1,24 @@
-import { Pool } from 'pg';
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
-// Lazy import to avoid issues with Prisma 7 adapter types
-let _prisma: any;
-
-function getPrisma() {
-  if (_prisma) return _prisma;
-  // Dynamically require to work around Prisma 7 type issues
-  const { PrismaClient } = require('@prisma/client');
-  try {
-    const { PrismaPg } = require('@prisma/adapter-pg');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const adapter = new PrismaPg(pool);
-    _prisma = new PrismaClient({ adapter });
-  } catch {
-    // Fallback if adapter not available
-    _prisma = new PrismaClient();
-  }
-  return _prisma;
+declare global {
+  // eslint-disable-next-line no-var
+  var prismaGlobal: PrismaClient | undefined;
 }
 
-export const prisma = getPrisma();
+function createClient(): PrismaClient {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+  });
+  const adapter = new PrismaPg(pool) as any;
+  return new PrismaClient({ adapter } as any) as PrismaClient;
+}
+
+export const prisma: PrismaClient =
+  global.prismaGlobal ?? createClient();
+
+if (process.env.NODE_ENV !== "production") {
+  global.prismaGlobal = prisma;
+}
