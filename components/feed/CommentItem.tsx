@@ -147,7 +147,7 @@ export default function CommentItem({
           {/* Like · Reply · Share · time */}
           <div className="_comment_reply">
             <div className="_comment_reply_num">
-              <ul className="_comment_reply_list">
+              <ul className="_comment_reply_list" style={{ whiteSpace: "nowrap" }}>
                 <li>
                   <span
                     onClick={handleLike}
