@@ -101,7 +101,7 @@ export default function CommentItem({
         </a>
       </div>
       <div className="_comment_area">
-        <div className="_comment_details">
+        <div className="_comment_details" style={{ minWidth: commentLikeCount > 0 ? "160px" : "auto" }}>
           {/* Author name */}
           <div className="_comment_details_top">
             <div className="_comment_name">
